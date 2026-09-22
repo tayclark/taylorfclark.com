@@ -1,0 +1,74 @@
+---
+interface Props {
+	title: string;
+	description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content={description} />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content="website" />
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>
+
+<style is:global>
+	:root {
+		--color-bg: #fdfdfc;
+		--color-text: #1a1a1a;
+		--color-text-dim: #5a5a5a;
+		--color-border: #e4e2dd;
+		--color-accent: #1d4ed8;
+		--max-width: 42rem;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		:root {
+			--color-bg: #14151a;
+			--color-text: #eceae5;
+			--color-text-dim: #9a988f;
+			--color-border: #2b2c33;
+			--color-accent: #7aa2ff;
+		}
+	}
+
+	* {
+		box-sizing: border-box;
+	}
+
+	html {
+		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif;
+	}
+
+	body {
+		margin: 0;
+		background: var(--color-bg);
+		color: var(--color-text);
+		line-height: 1.6;
+	}
+
+	a {
+		color: var(--color-accent);
+	}
+
+	h1, h2, h3 {
+		line-height: 1.2;
+	}
+
+	code {
+		font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+		font-size: 0.9em;
+	}
+</style>
