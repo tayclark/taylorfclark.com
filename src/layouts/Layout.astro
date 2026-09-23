@@ -13,6 +13,8 @@ const { title, description } = Astro.props;
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="description" content={description} />
+		<!-- TODO: remove once the site is ready to be publicly indexed (see taylorfclark.com DNS) -->
+		<meta name="robots" content="noindex, nofollow" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 		<meta property="og:title" content={title} />
