@@ -2,66 +2,82 @@
 import Layout from '../layouts/Layout.astro';
 import TerminalPrompt from '../components/TerminalPrompt.astro';
 
-const links = [
-	{ label: 'open github', href: 'https://github.com/tayclark', key: 'github', verb: 'open' as const, external: true },
+const contactLinks = [
+	{ label: 'GitHub', href: 'https://github.com/tayclark', key: 'github', verb: 'open' as const, external: true },
 	{
-		label: 'open linkedin',
+		label: 'LinkedIn',
 		href: 'https://www.linkedin.com/in/taylorfc',
 		key: 'linkedin',
 		verb: 'open' as const,
 		external: true,
 	},
-	{
-		label: 'open email',
-		href: 'mailto:taylorfclark@gmail.com',
-		key: 'email',
-		verb: 'open' as const,
-		external: false,
-	},
-	{ label: 'cd projects', href: '/projects', key: 'projects', verb: 'cd' as const, external: false },
-	{ label: 'cd experience', href: '/experience', key: 'experience', verb: 'cd' as const, external: false },
+	{ label: 'Email', href: 'mailto:taylorfclark@gmail.com', key: 'email', verb: 'open' as const, external: false },
 ];
+
+const pageLinks = [
+	{ label: 'Projects', href: '/projects', key: 'projects', verb: 'cd' as const, external: false },
+	{ label: 'Experience', href: '/experience', key: 'experience', verb: 'cd' as const, external: false },
+];
+
+const terminalTargets = [...contactLinks, ...pageLinks].map(({ key, verb, href, external }) => ({
+	key,
+	verb,
+	href,
+	external,
+}));
 ---
 
 <Layout
 	title="Taylor Clark — Software & Integration Engineer"
 	description="Backend and integrations engineer with a decade of experience building and operating production systems at early-stage SaaS startups."
 >
-	<main>
-		<h1>Taylor Clark</h1>
-		<p class="tagline">Backend &amp; integrations engineer · Ocean Springs, MS</p>
-		<p class="outside">Fishing, birding, photography/hiking, and vibe coding.</p>
+	<div class="page">
+		<header class="hero">
+			<h1>Taylor Clark</h1>
+			<p class="tagline">Backend &amp; integrations engineer · Ocean Springs, MS</p>
+			<p class="outside">Fishing, birding, photography/hiking, and vibe coding.</p>
 
-		<nav class="links">
-			{
-				links.map((link) => (
-					<a href={link.href} target={link.external ? '_blank' : undefined} rel={link.external ? 'noopener' : undefined}>
-						<span class="prompt" aria-hidden="true">$</span> {link.label}
-					</a>
-				))
-			}
-		</nav>
+			<nav class="contact-links">
+				{
+					contactLinks.map((link) => (
+						<a href={link.href} target={link.external ? '_blank' : undefined} rel={link.external ? 'noopener' : undefined}>
+							{link.label}
+						</a>
+					))
+				}
+			</nav>
 
-		<TerminalPrompt targets={links.map(({ key, verb, href, external }) => ({ key, verb, href, external }))} />
-	</main>
+			<nav class="page-links">
+				{pageLinks.map((link) => <a href={link.href}>{link.label}</a>)}
+			</nav>
+		</header>
+
+		<section class="terminal-section" aria-label="Interactive terminal">
+			<TerminalPrompt targets={terminalTargets} />
+		</section>
+	</div>
 </Layout>
 
 <style>
-	main {
+	.page {
 		min-height: 100dvh;
-		max-width: var(--max-width);
-		margin: 0 auto;
-		padding: 1.5rem;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.hero {
+		flex: 7 1 0;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		gap: 1.75rem;
+		gap: 1.25rem;
 		text-align: center;
+		padding: 1.5rem;
 	}
 
 	h1 {
-		font-size: 2rem;
+		font-size: 2.25rem;
 		margin: 0;
 	}
 
@@ -71,35 +87,54 @@ const links = [
 	}
 
 	.outside {
-		margin: -1.25rem 0 0;
+		margin: -0.75rem 0 0;
 		font-size: 0.9rem;
 		color: var(--color-text-dim);
 	}
 
-	.links {
+	.contact-links {
 		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.6rem;
-		font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+		gap: 1.5rem;
+		font-size: 1.05rem;
 	}
 
-	.links a {
+	.page-links {
+		display: flex;
+		gap: 1.25rem;
+		font-size: 0.9rem;
+	}
+
+	.contact-links a,
+	.page-links a {
 		text-decoration: none;
 		color: var(--color-text);
+		border-bottom: 1px solid var(--color-border);
+		padding-bottom: 0.15rem;
 	}
 
-	.links a:hover {
+	.contact-links a:hover,
+	.page-links a:hover {
 		color: var(--color-accent);
+		border-color: var(--color-accent);
 	}
 
-	.links .prompt {
-		color: var(--color-accent);
+	.terminal-section {
+		--color-bg: #0d0f0c;
+		--color-text: #d9d5c9;
+		--color-text-dim: #8a8676;
+		--color-accent: #7fbf6b;
+
+		flex: 3 1 0;
+		background: var(--color-bg);
+		color: var(--color-text);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 1.5rem;
 	}
 
-	main :global(.terminal) {
+	.terminal-section :global(.terminal) {
 		width: 100%;
-		max-width: 22rem;
-		text-align: left;
+		max-width: 30rem;
 	}
 </style>
