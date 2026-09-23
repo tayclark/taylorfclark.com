@@ -79,6 +79,11 @@ const { title, description } = Astro.props;
 		font-size: 0.9em;
 	}
 
+	:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 3px;
+	}
+
 	.skip-link {
 		position: absolute;
 		top: 0.5rem;

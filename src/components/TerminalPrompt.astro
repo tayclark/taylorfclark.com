@@ -16,7 +16,14 @@ const { targets, resume } = Astro.props;
 	data-targets={JSON.stringify(targets)}
 	data-resume={JSON.stringify(resume)}
 >
-	<div class="output" id="term-output" aria-live="polite"></div>
+	<div
+		class="output"
+		id="term-output"
+		role="region"
+		aria-label="Terminal output"
+		aria-live="polite"
+		tabindex="0"
+	></div>
 	<div class="prompt-line">
 		<span class="prompt" aria-hidden="true">
 			$
@@ -135,10 +142,15 @@ const { targets, resume } = Astro.props;
 		flex: 1;
 		background: transparent;
 		border: none;
-		outline: none;
 		color: var(--color-text);
 		font: inherit;
 		min-width: 0;
+	}
+
+	input:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 4px;
+		border-radius: 2px;
 	}
 
 	input::placeholder {
