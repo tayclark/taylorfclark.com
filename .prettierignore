@@ -1,6 +1,9 @@
 dist/
 .astro/
 node_modules/
+coverage/
+playwright-report/
+test-results/
 
 # Generated / lockfile
 package-lock.json
