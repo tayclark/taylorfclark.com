@@ -1,0 +1,177 @@
+---
+interface Target {
+	key: string;
+	verb: 'open' | 'cd';
+	href: string;
+	external?: boolean;
+}
+
+interface Props {
+	targets: Target[];
+}
+
+const { targets } = Astro.props;
+---
+
+<div class="terminal" id="term-root" data-targets={JSON.stringify(targets)}>
+	<div class="output" id="term-output" aria-live="polite"></div>
+	<div class="prompt-line">
+		<span class="prompt" aria-hidden="true">$</span>
+		<input
+			type="text"
+			id="term-input"
+			autocomplete="off"
+			autocapitalize="off"
+			spellcheck="false"
+			aria-label="Terminal command input — try help"
+			placeholder="try: help"
+		/>
+	</div>
+</div>
+
+<style>
+	.terminal {
+		font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+		font-size: 0.9rem;
+	}
+
+	.output {
+		max-height: 5.5em;
+		overflow-y: auto;
+		margin-bottom: 0.5rem;
+		color: var(--color-text-dim);
+	}
+
+	.output div {
+		white-space: pre-wrap;
+	}
+
+	.prompt-line {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.prompt {
+		color: var(--color-accent);
+	}
+
+	input {
+		flex: 1;
+		background: transparent;
+		border: none;
+		outline: none;
+		color: var(--color-text);
+		font: inherit;
+		min-width: 0;
+	}
+
+	input::placeholder {
+		color: var(--color-text-dim);
+		opacity: 0.6;
+	}
+</style>
+
+<script>
+	type Target = { key: string; verb: 'open' | 'cd'; href: string; external?: boolean };
+
+	const root = document.getElementById('term-root');
+	const output = document.getElementById('term-output');
+	const input = document.getElementById('term-input') as HTMLInputElement | null;
+	if (root && output && input) {
+		const targets: Target[] = JSON.parse(root.dataset.targets ?? '[]');
+		const history: string[] = [];
+		let historyIndex = -1;
+
+		function print(line: string) {
+			const div = document.createElement('div');
+			div.textContent = line;
+			output!.appendChild(div);
+			while (output!.childNodes.length > 6) {
+				output!.removeChild(output!.firstChild!);
+			}
+			output!.scrollTop = output!.scrollHeight;
+		}
+
+		function findTarget(verb: 'open' | 'cd', key: string) {
+			return targets.find((t) => t.verb === verb && t.key === key);
+		}
+
+		function run(raw: string) {
+			const cmd = raw.trim();
+			if (!cmd) return;
+			print(`$ ${cmd}`);
+
+			const [verb, ...rest] = cmd.split(/\s+/);
+			const arg = rest.join(' ');
+
+			if (verb === 'help') {
+				print('commands: ls, cd <page>, open <link>, help');
+				return;
+			}
+
+			if (verb === 'ls') {
+				print(targets.map((t) => t.key).join('  '));
+				return;
+			}
+
+			if (verb === 'cd') {
+				if (arg === '~' || arg === 'home' || arg === '') {
+					window.location.href = '/';
+					return;
+				}
+				const target = findTarget('cd', arg);
+				if (target) {
+					window.location.href = target.href;
+				} else {
+					print(`cd: no such page: ${arg}`);
+				}
+				return;
+			}
+
+			if (verb === 'open') {
+				const target = findTarget('open', arg);
+				if (target) {
+					if (target.external) {
+						window.open(target.href, '_blank', 'noopener');
+					} else {
+						window.location.href = target.href;
+					}
+				} else {
+					print(`open: no such link: ${arg}`);
+				}
+				return;
+			}
+
+			print(`command not found: ${verb}`);
+		}
+
+		input.addEventListener('keydown', (event) => {
+			if (event.key === 'Enter') {
+				const value = input.value;
+				run(value);
+				if (value.trim()) {
+					history.push(value.trim());
+				}
+				historyIndex = history.length;
+				input.value = '';
+			} else if (event.key === 'ArrowUp') {
+				if (historyIndex > 0) {
+					historyIndex -= 1;
+					input.value = history[historyIndex] ?? '';
+					requestAnimationFrame(() => input.setSelectionRange(input.value.length, input.value.length));
+				}
+				event.preventDefault();
+			} else if (event.key === 'ArrowDown') {
+				if (historyIndex < history.length - 1) {
+					historyIndex += 1;
+					input.value = history[historyIndex] ?? '';
+				} else {
+					historyIndex = history.length;
+					input.value = '';
+				}
+				event.preventDefault();
+			}
+		});
+	}
+</script>

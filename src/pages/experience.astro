@@ -1,0 +1,133 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const experience = [
+	{
+		role: 'Founder / Technical Lead',
+		org: 'Coast Software',
+		dates: 'Feb 2025 – Present',
+		blurb:
+			'Operate home-service businesses (remodeling, landscaping, seasonal installation) and build the software that runs them.',
+		bullets: [
+			'Designed and built osprey, an integration/automation backend on AWS Lambda + API Gateway, Terraform-provisioned (CloudFront, WAF, SSM secrets), CI-gated with Vitest coverage thresholds.',
+			"Hardened osprey's webhook delivery with SSRF-protected outbound requests and a designed idempotency-key/DLQ pattern.",
+			'Built coast-crm, a multi-tenant CRM (Next.js on AWS Amplify SSR) instrumented end-to-end with OpenTelemetry → Honeycomb.',
+			'Shipped clutterclear (AI vision-based resale-estimate app) and three client marketing sites (Astro/Tailwind, Lighthouse CI gates, Playwright e2e).',
+		],
+	},
+	{
+		role: 'Senior Software Engineer II',
+		org: 'Vitally.io',
+		dates: 'May 2021 – Nov 2024',
+		blurb:
+			'Joined post-Series A (employee #9) as one of the first engineering hires, as Vitally grew 10x revenue ($1M → $10M ARR) and tripled its engineering team.',
+		bullets: [
+			'Technical lead for an integrations team spanning Vitally FTE and offshore contract engineers; owned design, project planning, and execution for all integrations.',
+			'Drove a new integration framework built on common jobs, reducing effort to build new integrations and improving monitoring/observability.',
+			'Guided a platform team in infrastructure cost optimization that cut database spend by 40%.',
+		],
+	},
+	{
+		role: 'Senior Solutions Architect, Embedded',
+		org: 'Tray.io',
+		dates: 'Nov 2019 – May 2021',
+		blurb:
+			'Recruited as employee ~90 after Series B, as technical lead/architect for a new Embedded iPaaS product.',
+		bullets: [
+			'Developed on-premise connectors for enterprise systems.',
+			'Co-founded a Professional Services organization as technical lead, leading a team of four engineers.',
+			'Documented onboarding best practices that cut time-to-value from 45 to 14 days.',
+		],
+	},
+	{
+		role: 'Software Engineer II',
+		org: 'Cloud Elements',
+		dates: 'Aug 2016 – Nov 2019',
+		blurb: 'Startup iPaaS and automation platform, later acquired by UiPath.',
+		bullets: [
+			'Team lead for a 5-member contract team that delivered ~120 new connectors.',
+			'Transitioned to a platform team that migrated all services to Kubernetes to reduce costs.',
+		],
+	},
+];
+---
+
+<Layout
+	title="Experience — Taylor Clark"
+	description="A decade of backend and integrations experience: Coast Software, Vitally, Tray.io, Cloud Elements."
+>
+	<main>
+		<a class="back" href="/">$ cd ..</a>
+
+		<h1>Experience</h1>
+
+		{
+			experience.map((job) => (
+				<article class="card">
+					<h2>{job.role}, {job.org}</h2>
+					<p class="dates">{job.dates}</p>
+					<p>{job.blurb}</p>
+					<ul>
+						{job.bullets.map((bullet) => (
+							<li>{bullet}</li>
+						))}
+					</ul>
+				</article>
+			))
+		}
+	</main>
+</Layout>
+
+<style>
+	main {
+		max-width: var(--max-width);
+		margin: 0 auto;
+		padding: 3rem 1.5rem 4rem;
+	}
+
+	.back {
+		display: inline-block;
+		font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+		font-size: 0.9rem;
+		color: var(--color-text-dim);
+		text-decoration: none;
+		margin-bottom: 2rem;
+	}
+
+	.back:hover {
+		color: var(--color-accent);
+	}
+
+	h1 {
+		font-size: 1.75rem;
+		margin: 0 0 2rem;
+	}
+
+	.card {
+		margin-bottom: 1.75rem;
+	}
+
+	.card h2 {
+		font-size: 1.1rem;
+		margin: 0 0 0.25rem;
+	}
+
+	.card .dates {
+		font-size: 0.85rem;
+		color: var(--color-text-dim);
+		margin: 0 0 0.5rem;
+	}
+
+	.card p {
+		margin: 0 0 0.5rem;
+	}
+
+	.card ul {
+		margin: 0.5rem 0 0;
+		padding-left: 1.2rem;
+	}
+
+	.card li {
+		margin-bottom: 0.35rem;
+	}
+</style>

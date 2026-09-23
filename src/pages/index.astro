@@ -1,78 +1,25 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import TerminalPrompt from '../components/TerminalPrompt.astro';
 
-const experience = [
+const links = [
+	{ label: 'open github', href: 'https://github.com/tayclark', key: 'github', verb: 'open' as const, external: true },
 	{
-		role: 'Founder / Technical Lead',
-		org: 'Coast Software',
-		dates: 'Feb 2025 – Present',
-		blurb:
-			'Operate home-service businesses (remodeling, landscaping, seasonal installation) and build the software that runs them.',
-		bullets: [
-			'Designed and built osprey, an integration/automation backend on AWS Lambda + API Gateway, Terraform-provisioned (CloudFront, WAF, SSM secrets), CI-gated with Vitest coverage thresholds.',
-			"Hardened osprey's webhook delivery with SSRF-protected outbound requests and a designed idempotency-key/DLQ pattern.",
-			'Built coast-crm, a multi-tenant CRM (Next.js on AWS Amplify SSR) instrumented end-to-end with OpenTelemetry → Honeycomb.',
-			'Shipped clutterclear (AI vision-based resale-estimate app) and three client marketing sites (Astro/Tailwind, Lighthouse CI gates, Playwright e2e).',
-		],
+		label: 'open linkedin',
+		href: 'https://www.linkedin.com/in/taylorfc',
+		key: 'linkedin',
+		verb: 'open' as const,
+		external: true,
 	},
 	{
-		role: 'Senior Software Engineer II',
-		org: 'Vitally.io',
-		dates: 'May 2021 – Nov 2024',
-		blurb:
-			'Joined post-Series A (employee #9) as one of the first engineering hires, as Vitally grew 10x revenue ($1M → $10M ARR) and tripled its engineering team.',
-		bullets: [
-			'Technical lead for an integrations team spanning Vitally FTE and offshore contract engineers; owned design, project planning, and execution for all integrations.',
-			'Drove a new integration framework built on common jobs, reducing effort to build new integrations and improving monitoring/observability.',
-			'Guided a platform team in infrastructure cost optimization that cut database spend by 40%.',
-		],
+		label: 'open email',
+		href: 'mailto:taylorfclark@gmail.com',
+		key: 'email',
+		verb: 'open' as const,
+		external: false,
 	},
-	{
-		role: 'Senior Solutions Architect, Embedded',
-		org: 'Tray.io',
-		dates: 'Nov 2019 – May 2021',
-		blurb:
-			'Recruited as employee ~90 after Series B, as technical lead/architect for a new Embedded iPaaS product.',
-		bullets: [
-			'Developed on-premise connectors for enterprise systems.',
-			'Co-founded a Professional Services organization as technical lead, leading a team of four engineers.',
-			'Documented onboarding best practices that cut time-to-value from 45 to 14 days.',
-		],
-	},
-	{
-		role: 'Software Engineer II',
-		org: 'Cloud Elements',
-		dates: 'Aug 2016 – Nov 2019',
-		blurb: 'Startup iPaaS and automation platform, later acquired by UiPath.',
-		bullets: [
-			'Team lead for a 5-member contract team that delivered ~120 new connectors.',
-			'Transitioned to a platform team that migrated all services to Kubernetes to reduce costs.',
-		],
-	},
-];
-
-const projects = [
-	{
-		name: 'osprey',
-		tag: 'Integration & reliability engineering',
-		description:
-			'An integration/automation backend on AWS Lambda + API Gateway, Terraform-provisioned end to end (CloudFront, WAF, SSM-managed secrets), CI-gated via GitHub Actions with Vitest coverage thresholds. SSRF-hardened outbound requests, idempotency-key/DLQ handling for reliable webhook delivery, and self-graded engineering docs under docs/decisions/.',
-		link: 'https://github.com/tayclark/osprey',
-	},
-	{
-		name: 'coast-crm',
-		tag: 'SaaS & observability',
-		description:
-			'A multi-tenant CRM (Next.js on AWS Amplify SSR) running day-to-day operations for real home-service businesses, instrumented end-to-end with OpenTelemetry → Honeycomb.',
-		link: 'https://github.com/tayclark/coast-crm',
-	},
-	{
-		name: 'clutterclear',
-		tag: 'AI & mobile',
-		description:
-			'An AI vision-based resale-estimate app — YOLOv8 detection plus a local Ollama vision LLM pipeline, end to end.',
-		link: 'https://github.com/tayclark/clutterclear',
-	},
+	{ label: 'cd projects', href: '/projects', key: 'projects', verb: 'cd' as const, external: false },
+	{ label: 'cd experience', href: '/experience', key: 'experience', verb: 'cd' as const, external: false },
 ];
 ---
 
@@ -81,160 +28,78 @@ const projects = [
 	description="Backend and integrations engineer with a decade of experience building and operating production systems at early-stage SaaS startups."
 >
 	<main>
-		<header class="hero">
-			<h1>Taylor Clark</h1>
-			<p class="tagline">
-				Backend and integrations engineer with a decade of experience building and
-				operating production systems at early-stage SaaS startups — currently running
-				technical delivery for a small multi-product shop.
-			</p>
-			<p class="stack">
-				AWS (Lambda, CloudFront, WAF) · Terraform · PostgreSQL/Prisma · GitHub Actions ·
-				OpenTelemetry/Honeycomb
-			</p>
-			<nav class="links">
-				<a href="https://github.com/tayclark">GitHub</a>
-				<a href="https://www.linkedin.com/in/taylorfc">LinkedIn</a>
-				<a href="mailto:taylorfclark@gmail.com">Email</a>
-			</nav>
-		</header>
+		<h1>Taylor Clark</h1>
+		<p class="tagline">Backend &amp; integrations engineer · Ocean Springs, MS</p>
+		<p class="outside">Fishing, birding, photography/hiking, and vibe coding.</p>
 
-		<section aria-labelledby="projects-heading">
-			<h2 id="projects-heading">Projects</h2>
+		<nav class="links">
 			{
-				projects.map((project) => (
-					<article class="card">
-						<h3>
-							<a href={project.link}>{project.name}</a>
-							<span class="tag">{project.tag}</span>
-						</h3>
-						<p>{project.description}</p>
-					</article>
+				links.map((link) => (
+					<a href={link.href} target={link.external ? '_blank' : undefined} rel={link.external ? 'noopener' : undefined}>
+						<span class="prompt" aria-hidden="true">$</span> {link.label}
+					</a>
 				))
 			}
-		</section>
+		</nav>
 
-		<section aria-labelledby="experience-heading">
-			<h2 id="experience-heading">Experience</h2>
-			{
-				experience.map((job) => (
-					<article class="card">
-						<h3>{job.role}, {job.org}</h3>
-						<p class="dates">{job.dates}</p>
-						<p>{job.blurb}</p>
-						<ul>
-							{job.bullets.map((bullet) => (
-								<li>{bullet}</li>
-							))}
-						</ul>
-					</article>
-				))
-			}
-		</section>
-
-		<section aria-labelledby="outside-heading">
-			<h2 id="outside-heading">Outside work</h2>
-			<p>
-				Mississippi Gulf Coast native, based in Ocean Springs, MS. Outside of shipping
-				software: fishing, birding, and photography/hiking along the coast — plus a
-				growing interest in AI-assisted ("vibe coding") workflows, which shows up
-				throughout the project work above.
-			</p>
-		</section>
-
-		<footer>
-			<p>Taylor Clark · Ocean Springs, MS · <a href="mailto:taylorfclark@gmail.com">taylorfclark@gmail.com</a></p>
-		</footer>
+		<TerminalPrompt targets={links.map(({ key, verb, href, external }) => ({ key, verb, href, external }))} />
 	</main>
 </Layout>
 
 <style>
 	main {
+		min-height: 100dvh;
 		max-width: var(--max-width);
 		margin: 0 auto;
-		padding: 3rem 1.5rem 4rem;
+		padding: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 1.75rem;
+		text-align: center;
 	}
 
-	.hero h1 {
-		font-size: 2.25rem;
-		margin: 0 0 0.75rem;
+	h1 {
+		font-size: 2rem;
+		margin: 0;
 	}
 
 	.tagline {
-		font-size: 1.05rem;
+		margin: 0;
 		color: var(--color-text-dim);
-		margin: 0 0 0.75rem;
 	}
 
-	.stack {
+	.outside {
+		margin: -1.25rem 0 0;
 		font-size: 0.9rem;
 		color: var(--color-text-dim);
-		margin: 0 0 1.25rem;
 	}
 
 	.links {
 		display: flex;
-		gap: 1rem;
-		font-size: 0.95rem;
-		margin-bottom: 2.5rem;
-	}
-
-	section {
-		margin-top: 3rem;
-	}
-
-	section h2 {
-		font-size: 1.4rem;
-		border-bottom: 1px solid var(--color-border);
-		padding-bottom: 0.5rem;
-		margin-bottom: 1.5rem;
-	}
-
-	.card {
-		margin-bottom: 1.75rem;
-	}
-
-	.card h3 {
-		font-size: 1.1rem;
-		margin: 0 0 0.25rem;
-		display: flex;
-		align-items: baseline;
+		flex-direction: column;
+		align-items: center;
 		gap: 0.6rem;
-		flex-wrap: wrap;
+		font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	}
 
-	.card .tag {
-		font-size: 0.75rem;
-		font-weight: 400;
-		color: var(--color-text-dim);
-		text-transform: uppercase;
-		letter-spacing: 0.03em;
+	.links a {
+		text-decoration: none;
+		color: var(--color-text);
 	}
 
-	.card .dates {
-		font-size: 0.85rem;
-		color: var(--color-text-dim);
-		margin: 0 0 0.5rem;
+	.links a:hover {
+		color: var(--color-accent);
 	}
 
-	.card p {
-		margin: 0 0 0.5rem;
+	.links .prompt {
+		color: var(--color-accent);
 	}
 
-	.card ul {
-		margin: 0.5rem 0 0;
-		padding-left: 1.2rem;
-	}
-
-	.card li {
-		margin-bottom: 0.35rem;
-	}
-
-	footer {
-		margin-top: 4rem;
-		padding-top: 1.5rem;
-		border-top: 1px solid var(--color-border);
-		font-size: 0.85rem;
-		color: var(--color-text-dim);
+	main :global(.terminal) {
+		width: 100%;
+		max-width: 22rem;
+		text-align: left;
 	}
 </style>
