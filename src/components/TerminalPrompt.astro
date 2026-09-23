@@ -1,4 +1,6 @@
 ---
+import type { ResumeData } from '../data/resume';
+
 interface Target {
 	key: string;
 	verb: 'open' | 'cd';
@@ -8,17 +10,17 @@ interface Target {
 
 interface Props {
 	targets: Target[];
-	files?: Record<string, string>;
+	resume: ResumeData;
 }
 
-const { targets, files = {} } = Astro.props;
+const { targets, resume } = Astro.props;
 ---
 
 <div
 	class="terminal"
 	id="term-root"
 	data-targets={JSON.stringify(targets)}
-	data-files={JSON.stringify(files)}
+	data-resume={JSON.stringify(resume)}
 >
 	<div class="output" id="term-output" aria-live="polite"></div>
 	<div class="prompt-line">
@@ -50,12 +52,79 @@ const { targets, files = {} } = Astro.props;
 		color: var(--color-text-dim);
 	}
 
-	.output div {
+	/* Everything below targets elements the terminal script creates at runtime,
+	   which never receive Astro's compile-time scoping attribute — :global()
+	   is required or these rules silently no-op. */
+
+	:global(#term-output div) {
 		white-space: pre-wrap;
 	}
 
-	.output:has(.block) {
+	:global(.output:has(.block)) {
 		max-height: 60vh;
+	}
+
+	:global(.resume) {
+		white-space: normal;
+	}
+
+	:global(.r-name) {
+		color: var(--color-accent);
+		font-weight: 700;
+	}
+
+	:global(.r-contact) {
+		color: var(--color-text-dim);
+		margin-bottom: 0.5rem;
+	}
+
+	:global(.r-summary) {
+		margin: 0.5rem 0;
+	}
+
+	:global(.r-heading) {
+		margin-top: 0.85rem;
+		color: var(--color-accent);
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		border-bottom: 1px solid currentColor;
+		padding-bottom: 0.15rem;
+	}
+
+	:global(.r-role-line) {
+		display: flex;
+		justify-content: space-between;
+		gap: 0.75rem;
+		margin-top: 0.6rem;
+		font-weight: 700;
+	}
+
+	:global(.r-dates) {
+		color: var(--color-text-dim);
+		font-weight: 400;
+		white-space: nowrap;
+	}
+
+	:global(.r-blurb) {
+		margin: 0.2rem 0;
+		color: var(--color-text-dim);
+		font-style: italic;
+	}
+
+	:global(.r-bullets) {
+		margin: 0.3rem 0 0.3rem 1.1rem;
+		padding: 0;
+	}
+
+	:global(.r-bullets li) {
+		margin: 0.2rem 0;
+	}
+
+	:global(.r-tech) {
+		margin: 0.3rem 0 0.5rem;
+		color: var(--color-text-dim);
+		font-size: 0.85em;
 	}
 
 	.prompt-line {
@@ -91,13 +160,31 @@ const { targets, files = {} } = Astro.props;
 		href: string;
 		external?: boolean;
 	}
+	interface ResumeEntry {
+		role: string;
+		org: string;
+		dates: string;
+		blurb?: string;
+		bullets: string[];
+		tech: string;
+	}
+	interface ResumeSection {
+		title: string;
+		entries: ResumeEntry[];
+	}
+	interface ResumeData {
+		name: string;
+		contact: string;
+		summary: string;
+		sections: ResumeSection[];
+	}
 
 	const root = document.getElementById('term-root');
 	const output = document.getElementById('term-output');
 	const input = document.getElementById('term-input') as HTMLInputElement | null;
 	if (root && output && input) {
 		const targets: Target[] = JSON.parse(root.dataset.targets ?? '[]');
-		const files: Record<string, string> = JSON.parse(root.dataset.files ?? '{}');
+		const resume: ResumeData | null = JSON.parse(root.dataset.resume ?? 'null');
 		const out = output;
 		const history: string[] = [];
 		let historyIndex = -1;
@@ -116,11 +203,70 @@ const { targets, files = {} } = Astro.props;
 			out.scrollTop = out.scrollHeight;
 		}
 
-		function printBlock(text: string) {
-			const div = document.createElement('div');
-			div.className = 'block';
-			div.textContent = text;
-			out.appendChild(div);
+		function printResume(data: ResumeData) {
+			const container = document.createElement('div');
+			container.className = 'block resume';
+
+			const name = document.createElement('div');
+			name.className = 'r-name';
+			name.textContent = data.name;
+			container.appendChild(name);
+
+			const contact = document.createElement('div');
+			contact.className = 'r-contact';
+			contact.textContent = data.contact;
+			container.appendChild(contact);
+
+			const summary = document.createElement('p');
+			summary.className = 'r-summary';
+			summary.textContent = data.summary;
+			container.appendChild(summary);
+
+			for (const section of data.sections) {
+				const heading = document.createElement('div');
+				heading.className = 'r-heading';
+				heading.textContent = section.title;
+				container.appendChild(heading);
+
+				for (const entry of section.entries) {
+					const roleLine = document.createElement('div');
+					roleLine.className = 'r-role-line';
+					const roleSpan = document.createElement('span');
+					roleSpan.textContent = entry.org ? `${entry.role} — ${entry.org}` : entry.role;
+					const datesSpan = document.createElement('span');
+					datesSpan.className = 'r-dates';
+					datesSpan.textContent = entry.dates;
+					roleLine.append(roleSpan, datesSpan);
+					container.appendChild(roleLine);
+
+					if (entry.blurb) {
+						const blurb = document.createElement('div');
+						blurb.className = 'r-blurb';
+						blurb.textContent = entry.blurb;
+						container.appendChild(blurb);
+					}
+
+					if (entry.bullets.length) {
+						const ul = document.createElement('ul');
+						ul.className = 'r-bullets';
+						for (const bullet of entry.bullets) {
+							const li = document.createElement('li');
+							li.textContent = bullet;
+							ul.appendChild(li);
+						}
+						container.appendChild(ul);
+					}
+
+					if (entry.tech) {
+						const tech = document.createElement('div');
+						tech.className = 'r-tech';
+						tech.textContent = `Technologies: ${entry.tech}`;
+						container.appendChild(tech);
+					}
+				}
+			}
+
+			out.appendChild(container);
 			trim();
 			out.scrollTop = out.scrollHeight;
 		}
@@ -138,20 +284,19 @@ const { targets, files = {} } = Astro.props;
 			const arg = rest.join(' ');
 
 			if (verb === 'help') {
-				print('commands: ls, cd <page>, open <link|all>, cat <file>, help');
+				print('commands: ls, cd <page>, open <link|all>, cat resume, help');
 				return;
 			}
 
 			if (verb === 'ls') {
-				print([...targets.map((t) => t.key), ...Object.keys(files)].join('  '));
+				print([...targets.map((t) => t.key), 'resume'].join('  '));
 				return;
 			}
 
 			if (verb === 'cat') {
 				const name = arg.replace(/^\.?\/?/, '');
-				const contents = files[name];
-				if (contents) {
-					printBlock(contents);
+				if (name === 'resume' && resume) {
+					printResume(resume);
 				} else {
 					print(`cat: ${arg || 'missing operand'}: No such file`);
 				}
