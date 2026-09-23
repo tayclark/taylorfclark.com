@@ -57,24 +57,26 @@ const experience = [
 	description="A decade of backend and integrations experience: Coast Software, Vitally, Tray.io, Cloud Elements."
 >
 	<main>
-		<a class="back" href="/">$ cd ..</a>
+		<a class="back" href="/">
+			$ cd ..
+		</a>
 
 		<h1>Experience</h1>
 
-		{
-			experience.map((job) => (
-				<article class="card">
-					<h2>{job.role}, {job.org}</h2>
-					<p class="dates">{job.dates}</p>
-					<p>{job.blurb}</p>
-					<ul>
-						{job.bullets.map((bullet) => (
-							<li>{bullet}</li>
-						))}
-					</ul>
-				</article>
-			))
-		}
+		{experience.map((job) => (
+			<article class="card">
+				<h2>
+					{job.role}, {job.org}
+				</h2>
+				<p class="dates">{job.dates}</p>
+				<p>{job.blurb}</p>
+				<ul>
+					{job.bullets.map((bullet) => (
+						<li>{bullet}</li>
+					))}
+				</ul>
+			</article>
+		))}
 	</main>
 </Layout>
 

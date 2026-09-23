@@ -14,10 +14,17 @@ interface Props {
 const { targets, files = {} } = Astro.props;
 ---
 
-<div class="terminal" id="term-root" data-targets={JSON.stringify(targets)} data-files={JSON.stringify(files)}>
+<div
+	class="terminal"
+	id="term-root"
+	data-targets={JSON.stringify(targets)}
+	data-files={JSON.stringify(files)}
+>
 	<div class="output" id="term-output" aria-live="polite"></div>
 	<div class="prompt-line">
-		<span class="prompt" aria-hidden="true">$</span>
+		<span class="prompt" aria-hidden="true">
+			$
+		</span>
 		<input
 			type="text"
 			id="term-input"
@@ -206,7 +213,9 @@ const { targets, files = {} } = Astro.props;
 				if (historyIndex > 0) {
 					historyIndex -= 1;
 					input.value = history[historyIndex] ?? '';
-					requestAnimationFrame(() => input.setSelectionRange(input.value.length, input.value.length));
+					requestAnimationFrame(() =>
+						input.setSelectionRange(input.value.length, input.value.length),
+					);
 				}
 				event.preventDefault();
 			} else if (event.key === 'ArrowDown') {
