@@ -50,7 +50,7 @@ const terminalTargets = [...contactLinks, ...pageLinks].map(({ key, verb, href, 
 	title="Taylor Clark — Software & Integration Engineer"
 	description="Backend and integrations engineer with a decade of experience building and operating production systems at early-stage SaaS startups."
 >
-	<div class="page">
+	<main id="main" class="page">
 		<header class="hero">
 			<h1>Taylor Clark</h1>
 			<p class="tagline">Backend &amp; integrations engineer · Ocean Springs, MS</p>
@@ -59,12 +59,12 @@ const terminalTargets = [...contactLinks, ...pageLinks].map(({ key, verb, href, 
 			</p>
 			<p class="outside">Fishing, birding, photography/hiking, and vibe coding.</p>
 
-			<nav class="contact-links">
+			<nav class="contact-links" aria-label="Contact links">
 				{contactLinks.map((link) => (
 					<a
 						href={link.href}
 						target={link.external ? '_blank' : undefined}
-						rel={link.external ? 'noopener' : undefined}
+						rel={link.external ? 'noopener noreferrer' : undefined}
 					>
 						{link.key === 'github' && (
 							<svg
@@ -115,11 +115,12 @@ const terminalTargets = [...contactLinks, ...pageLinks].map(({ key, verb, href, 
 							</svg>
 						)}
 						<span>{link.label}</span>
+						{link.external && <span class="sr-only">(opens in new tab)</span>}
 					</a>
 				))}
 			</nav>
 
-			<nav class="page-links">
+			<nav class="page-links" aria-label="Pages">
 				{pageLinks.map((link) => (
 					<a href={link.href}>{link.label}</a>
 				))}
@@ -130,7 +131,7 @@ const terminalTargets = [...contactLinks, ...pageLinks].map(({ key, verb, href, 
 				<TerminalPrompt targets={terminalTargets} resume={resume} />
 			</div>
 		</header>
-	</div>
+	</main>
 </Layout>
 
 <style>
