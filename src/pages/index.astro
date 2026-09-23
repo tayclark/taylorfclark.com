@@ -35,6 +35,7 @@ const terminalTargets = [...contactLinks, ...pageLinks].map(({ key, verb, href, 
 		<header class="hero">
 			<h1>Taylor Clark</h1>
 			<p class="tagline">Backend &amp; integrations engineer · Ocean Springs, MS</p>
+			<p class="positioning">Currently running technical delivery for a small multi-product shop.</p>
 			<p class="outside">Fishing, birding, photography/hiking, and vibe coding.</p>
 
 			<nav class="contact-links">
@@ -102,6 +103,11 @@ const terminalTargets = [...contactLinks, ...pageLinks].map(({ key, verb, href, 
 
 	.tagline {
 		margin: 0;
+		color: var(--color-text-dim);
+	}
+
+	.positioning {
+		margin: -0.75rem 0 0;
 		color: var(--color-text-dim);
 	}
 
