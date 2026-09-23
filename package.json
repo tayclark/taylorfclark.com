@@ -16,7 +16,9 @@
     "lint": "eslint .",
     "prepare": "husky",
     "test:unit": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test": "vitest run && playwright test"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
