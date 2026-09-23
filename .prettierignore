@@ -7,3 +7,4 @@ test-results/
 
 # Generated / lockfile
 package-lock.json
+.lighthouseci/

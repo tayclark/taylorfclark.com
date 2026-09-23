@@ -11,13 +11,16 @@ permissions:
   pages: write
   id-token: write
 
+# Per-ref group, and only PR runs are cancellable, so a PR run can never
+# cancel a deploy from main.
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: pages-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,11 +28,16 @@ jobs:
           node-version-file: '.nvmrc'
           cache: npm
       - run: npm ci
+      - run: npm audit --omit=dev --audit-level=high
       - run: npm run check
       - run: npm run lint
       - run: npm run format:check
       - run: npm run test:coverage
       - run: npm run build
+      - name: Lighthouse CI
+        run: npm run lighthouse:ci
+      - if: always()
+        run: node scripts/lhci-summary.mjs >> "$GITHUB_STEP_SUMMARY"
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - if: failure()
@@ -47,6 +55,7 @@ jobs:
     if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
