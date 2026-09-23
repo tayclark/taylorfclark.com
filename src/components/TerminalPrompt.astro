@@ -1,12 +1,6 @@
 ---
 import type { ResumeData } from '../data/resume';
-
-interface Target {
-	key: string;
-	verb: 'open' | 'cd';
-	href: string;
-	external?: boolean;
-}
+import type { Target } from '../lib/terminal';
 
 interface Props {
 	targets: Target[];
@@ -154,30 +148,8 @@ const { targets, resume } = Astro.props;
 </style>
 
 <script>
-	interface Target {
-		key: string;
-		verb: 'open' | 'cd';
-		href: string;
-		external?: boolean;
-	}
-	interface ResumeEntry {
-		role: string;
-		org: string;
-		dates: string;
-		blurb?: string;
-		bullets: string[];
-		tech: string;
-	}
-	interface ResumeSection {
-		title: string;
-		entries: ResumeEntry[];
-	}
-	interface ResumeData {
-		name: string;
-		contact: string;
-		summary: string;
-		sections: ResumeSection[];
-	}
+	import type { ResumeData } from '../data/resume';
+	import { createHistory, openAllMessage, runCommand, type Target } from '../lib/terminal';
 
 	const root = document.getElementById('term-root');
 	const output = document.getElementById('term-output');
@@ -186,8 +158,7 @@ const { targets, resume } = Astro.props;
 		const targets: Target[] = JSON.parse(root.dataset.targets ?? '[]');
 		const resume: ResumeData | null = JSON.parse(root.dataset.resume ?? 'null');
 		const out = output;
-		const history: string[] = [];
-		let historyIndex = -1;
+		const history = createHistory();
 
 		function trim() {
 			while (out.childNodes.length > 6 && out.firstChild) {
@@ -271,112 +242,49 @@ const { targets, resume } = Astro.props;
 			out.scrollTop = out.scrollHeight;
 		}
 
-		function findTarget(verb: 'open' | 'cd', key: string) {
-			return targets.find((t) => t.verb === verb && t.key === key);
-		}
-
 		function run(raw: string) {
-			const cmd = raw.trim();
-			if (!cmd) return;
-			print(`$ ${cmd}`);
+			const { lines, action } = runCommand(raw, { targets, resume });
+			for (const line of lines) print(line);
+			if (!action) return;
 
-			const [verb, ...rest] = cmd.split(/\s+/);
-			const arg = rest.join(' ');
-
-			if (verb === 'help') {
-				print('commands: ls, cd <page>, open <link|all>, cat resume, help');
-				return;
-			}
-
-			if (verb === 'ls') {
-				print([...targets.map((t) => t.key), 'resume'].join('  '));
-				return;
-			}
-
-			if (verb === 'cat') {
-				const name = arg.replace(/^\.?\/?/, '');
-				if (name === 'resume' && resume) {
-					printResume(resume);
-				} else {
-					print(`cat: ${arg || 'missing operand'}: No such file`);
-				}
-				return;
-			}
-
-			if (verb === 'cd') {
-				if (arg === '~' || arg === 'home' || arg === '') {
-					window.location.href = '/';
-					return;
-				}
-				const target = findTarget('cd', arg);
-				if (target) {
-					window.location.href = target.href;
-				} else {
-					print(`cd: no such page: ${arg}`);
-				}
-				return;
-			}
-
-			if (verb === 'open') {
-				if (arg === 'all') {
-					const openables = targets.filter((t) => t.verb === 'open');
+			switch (action.type) {
+				case 'print-resume':
+					if (resume) printResume(resume);
+					break;
+				case 'navigate':
+					window.location.href = action.href;
+					break;
+				case 'open':
+					window.open(action.href, '_blank', 'noopener');
+					break;
+				case 'open-all': {
 					let blocked = 0;
-					for (const t of openables) {
-						const win = window.open(t.href, '_blank', 'noopener');
-						if (!win) blocked += 1;
+					for (const t of action.targets) {
+						if (!window.open(t.href, '_blank', 'noopener')) blocked += 1;
 					}
-					if (blocked > 0) {
-						print(
-							`opened ${openables.length - blocked}/${openables.length} links (${blocked} blocked by your browser's pop-up blocker)`,
-						);
-					} else {
-						print(`opened ${openables.length} links: ${openables.map((t) => t.key).join(', ')}`);
-					}
-					return;
+					print(openAllMessage(action.targets, blocked));
+					break;
 				}
-
-				const target = findTarget('open', arg);
-				if (target) {
-					if (target.external) {
-						window.open(target.href, '_blank', 'noopener');
-					} else {
-						window.location.href = target.href;
-					}
-				} else {
-					print(`open: no such link: ${arg}`);
-				}
-				return;
 			}
-
-			print(`command not found: ${verb}`);
 		}
 
 		input.addEventListener('keydown', (event) => {
 			if (event.key === 'Enter') {
 				const value = input.value;
 				run(value);
-				if (value.trim()) {
-					history.push(value.trim());
-				}
-				historyIndex = history.length;
+				history.push(value);
 				input.value = '';
 			} else if (event.key === 'ArrowUp') {
-				if (historyIndex > 0) {
-					historyIndex -= 1;
-					input.value = history[historyIndex] ?? '';
+				const previous = history.up();
+				if (previous !== null) {
+					input.value = previous;
 					requestAnimationFrame(() =>
 						input.setSelectionRange(input.value.length, input.value.length),
 					);
 				}
 				event.preventDefault();
 			} else if (event.key === 'ArrowDown') {
-				if (historyIndex < history.length - 1) {
-					historyIndex += 1;
-					input.value = history[historyIndex] ?? '';
-				} else {
-					historyIndex = history.length;
-					input.value = '';
-				}
+				input.value = history.down();
 				event.preventDefault();
 			}
 		});
