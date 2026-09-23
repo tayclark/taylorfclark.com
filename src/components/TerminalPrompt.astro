@@ -106,7 +106,7 @@ const { targets } = Astro.props;
 			const arg = rest.join(' ');
 
 			if (verb === 'help') {
-				print('commands: ls, cd <page>, open <link>, help');
+				print('commands: ls, cd <page>, open <link|all>, help');
 				return;
 			}
 
@@ -130,6 +130,23 @@ const { targets } = Astro.props;
 			}
 
 			if (verb === 'open') {
+				if (arg === 'all') {
+					const openables = targets.filter((t) => t.verb === 'open');
+					let blocked = 0;
+					for (const t of openables) {
+						const win = window.open(t.href, '_blank', 'noopener');
+						if (!win) blocked += 1;
+					}
+					if (blocked > 0) {
+						print(
+							`opened ${openables.length - blocked}/${openables.length} links (${blocked} blocked by your browser's pop-up blocker)`,
+						);
+					} else {
+						print(`opened ${openables.length} links: ${openables.map((t) => t.key).join(', ')}`);
+					}
+					return;
+				}
+
 				const target = findTarget('open', arg);
 				if (target) {
 					if (target.external) {
