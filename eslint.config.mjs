@@ -14,6 +14,7 @@ export default defineConfig(
 		'coverage/',
 		'playwright-report/',
 		'test-results/',
+		'.lighthouseci/',
 	]),
 	js.configs.recommended,
 	tseslint.configs.strict,
@@ -23,7 +24,7 @@ export default defineConfig(
 		// Plain Node config files (astro.config.mjs and friends) aren't
 		// covered by typescript-eslint's TS-only file patterns, so they don't
 		// pick up Node ambient types the way .ts files do via @types/node.
-		files: ['**/*.mjs'],
+		files: ['**/*.mjs', '**/*.cjs'],
 		languageOptions: {
 			globals: globals.node,
 		},

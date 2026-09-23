@@ -18,7 +18,8 @@
     "test:unit": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "test": "vitest run && playwright test"
+    "test": "vitest run && playwright test",
+    "lighthouse:ci": "lhci autorun"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
@@ -33,6 +34,7 @@
     "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
     "@eslint/js": "^10.0.1",
+    "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.63.0",
     "@vitest/coverage-v8": "^5.0.1",
     "eslint": "^10.11.0",
