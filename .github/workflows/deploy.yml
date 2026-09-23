@@ -47,7 +47,7 @@ jobs:
           path: playwright-report/
           if-no-files-found: ignore
       - if: github.event_name != 'pull_request'
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: dist
 
