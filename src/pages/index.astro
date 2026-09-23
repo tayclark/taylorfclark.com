@@ -50,11 +50,12 @@ const terminalTargets = [...contactLinks, ...pageLinks].map(({ key, verb, href, 
 			<nav class="page-links">
 				{pageLinks.map((link) => <a href={link.href}>{link.label}</a>)}
 			</nav>
-		</header>
 
-		<section class="terminal-section" aria-label="Interactive terminal">
-			<TerminalPrompt targets={terminalTargets} />
-		</section>
+			<div class="terminal-card">
+				<p class="terminal-label">or, try the terminal —</p>
+				<TerminalPrompt targets={terminalTargets} />
+			</div>
+		</header>
 	</div>
 </Layout>
 
@@ -66,7 +67,7 @@ const terminalTargets = [...contactLinks, ...pageLinks].map(({ key, verb, href, 
 	}
 
 	.hero {
-		flex: 7 1 0;
+		flex: 1;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -118,23 +119,27 @@ const terminalTargets = [...contactLinks, ...pageLinks].map(({ key, verb, href, 
 		border-color: var(--color-accent);
 	}
 
-	.terminal-section {
-		--color-bg: #0d0f0c;
+	.terminal-card {
+		--color-bg: #14150f;
 		--color-text: #d9d5c9;
 		--color-text-dim: #8a8676;
 		--color-accent: #7fbf6b;
 
-		flex: 3 1 0;
+		width: 100%;
+		max-width: 28rem;
+		margin-top: 1.5rem;
 		background: var(--color-bg);
-		color: var(--color-text);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding: 1.5rem;
+		border: 1px solid #2a2c22;
+		border-radius: 0.75rem;
+		padding: 1.25rem 1.5rem;
+		box-shadow: 0 1rem 2.5rem rgba(20, 21, 15, 0.12);
+		text-align: left;
 	}
 
-	.terminal-section :global(.terminal) {
-		width: 100%;
-		max-width: 30rem;
+	.terminal-label {
+		margin: 0 0 0.6rem;
+		font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+		font-size: 0.75rem;
+		color: var(--color-text-dim);
 	}
 </style>
