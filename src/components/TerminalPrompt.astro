@@ -21,9 +21,9 @@ const { targets, resume } = Astro.props;
 		id="term-output"
 		role="region"
 		aria-label="Terminal output"
-		aria-live="polite"
 		tabindex="0"
 	></div>
+	<div class="sr-only" id="term-status" role="status"></div>
 	<div class="prompt-line">
 		<span class="prompt" aria-hidden="true">
 			$
@@ -166,11 +166,14 @@ const { targets, resume } = Astro.props;
 	const root = document.getElementById('term-root');
 	const output = document.getElementById('term-output');
 	const input = document.getElementById('term-input') as HTMLInputElement | null;
-	if (root && output && input) {
+	const status = document.getElementById('term-status');
+	if (root && output && input && status) {
 		const targets: Target[] = JSON.parse(root.dataset.targets ?? '[]');
 		const resume: ResumeData | null = JSON.parse(root.dataset.resume ?? 'null');
 		const out = output;
+		const live = status;
 		const history = createHistory();
+		const MAX_ANNOUNCEMENTS = 3;
 
 		function trim() {
 			while (out.childNodes.length > 6 && out.firstChild) {
@@ -178,10 +181,21 @@ const { targets, resume } = Astro.props;
 			}
 		}
 
+		/** Screen-reader announcement, kept separate from the output so long blocks aren't read aloud. */
+		function announce(message: string) {
+			const div = document.createElement('div');
+			div.textContent = message;
+			live.appendChild(div);
+			while (live.childNodes.length > MAX_ANNOUNCEMENTS && live.firstChild) {
+				live.removeChild(live.firstChild);
+			}
+		}
+
 		function print(line: string) {
 			const div = document.createElement('div');
 			div.textContent = line;
 			out.appendChild(div);
+			announce(line);
 			trim();
 			out.scrollTop = out.scrollHeight;
 		}
@@ -250,6 +264,7 @@ const { targets, resume } = Astro.props;
 			}
 
 			out.appendChild(container);
+			announce('Resume printed in the terminal output. It is also on the Experience page.');
 			trim();
 			out.scrollTop = out.scrollHeight;
 		}
