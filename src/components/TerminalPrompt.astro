@@ -85,7 +85,12 @@ const { targets, files = {} } = Astro.props;
 </style>
 
 <script>
-	type Target = { key: string; verb: 'open' | 'cd'; href: string; external?: boolean };
+	interface Target {
+		key: string;
+		verb: 'open' | 'cd';
+		href: string;
+		external?: boolean;
+	}
 
 	const root = document.getElementById('term-root');
 	const output = document.getElementById('term-output');
@@ -93,30 +98,31 @@ const { targets, files = {} } = Astro.props;
 	if (root && output && input) {
 		const targets: Target[] = JSON.parse(root.dataset.targets ?? '[]');
 		const files: Record<string, string> = JSON.parse(root.dataset.files ?? '{}');
+		const out = output;
 		const history: string[] = [];
 		let historyIndex = -1;
 
 		function trim() {
-			while (output!.childNodes.length > 6) {
-				output!.removeChild(output!.firstChild!);
+			while (out.childNodes.length > 6 && out.firstChild) {
+				out.removeChild(out.firstChild);
 			}
 		}
 
 		function print(line: string) {
 			const div = document.createElement('div');
 			div.textContent = line;
-			output!.appendChild(div);
+			out.appendChild(div);
 			trim();
-			output!.scrollTop = output!.scrollHeight;
+			out.scrollTop = out.scrollHeight;
 		}
 
 		function printBlock(text: string) {
 			const div = document.createElement('div');
 			div.className = 'block';
 			div.textContent = text;
-			output!.appendChild(div);
+			out.appendChild(div);
 			trim();
-			output!.scrollTop = output!.scrollHeight;
+			out.scrollTop = out.scrollHeight;
 		}
 
 		function findTarget(verb: 'open' | 'cd', key: string) {
