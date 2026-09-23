@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import TerminalPrompt from '../components/TerminalPrompt.astro';
+import resumeText from '../data/resume.txt?raw';
 
 const contactLinks = [
 	{ label: 'GitHub', href: 'https://github.com/tayclark', key: 'github', verb: 'open' as const, external: true },
@@ -72,7 +73,7 @@ const terminalTargets = [...contactLinks, ...pageLinks].map(({ key, verb, href, 
 
 			<div class="terminal-card">
 				<p class="terminal-label">or, try the terminal —</p>
-				<TerminalPrompt targets={terminalTargets} />
+				<TerminalPrompt targets={terminalTargets} files={{ resume: resumeText.trim() }} />
 			</div>
 		</header>
 	</div>

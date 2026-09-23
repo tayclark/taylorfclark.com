@@ -8,12 +8,13 @@ interface Target {
 
 interface Props {
 	targets: Target[];
+	files?: Record<string, string>;
 }
 
-const { targets } = Astro.props;
+const { targets, files = {} } = Astro.props;
 ---
 
-<div class="terminal" id="term-root" data-targets={JSON.stringify(targets)}>
+<div class="terminal" id="term-root" data-targets={JSON.stringify(targets)} data-files={JSON.stringify(files)}>
 	<div class="output" id="term-output" aria-live="polite"></div>
 	<div class="prompt-line">
 		<span class="prompt" aria-hidden="true">$</span>
@@ -44,6 +45,10 @@ const { targets } = Astro.props;
 
 	.output div {
 		white-space: pre-wrap;
+	}
+
+	.output:has(.block) {
+		max-height: 60vh;
 	}
 
 	.prompt-line {
@@ -80,16 +85,30 @@ const { targets } = Astro.props;
 	const input = document.getElementById('term-input') as HTMLInputElement | null;
 	if (root && output && input) {
 		const targets: Target[] = JSON.parse(root.dataset.targets ?? '[]');
+		const files: Record<string, string> = JSON.parse(root.dataset.files ?? '{}');
 		const history: string[] = [];
 		let historyIndex = -1;
+
+		function trim() {
+			while (output!.childNodes.length > 6) {
+				output!.removeChild(output!.firstChild!);
+			}
+		}
 
 		function print(line: string) {
 			const div = document.createElement('div');
 			div.textContent = line;
 			output!.appendChild(div);
-			while (output!.childNodes.length > 6) {
-				output!.removeChild(output!.firstChild!);
-			}
+			trim();
+			output!.scrollTop = output!.scrollHeight;
+		}
+
+		function printBlock(text: string) {
+			const div = document.createElement('div');
+			div.className = 'block';
+			div.textContent = text;
+			output!.appendChild(div);
+			trim();
 			output!.scrollTop = output!.scrollHeight;
 		}
 
@@ -106,12 +125,23 @@ const { targets } = Astro.props;
 			const arg = rest.join(' ');
 
 			if (verb === 'help') {
-				print('commands: ls, cd <page>, open <link|all>, help');
+				print('commands: ls, cd <page>, open <link|all>, cat <file>, help');
 				return;
 			}
 
 			if (verb === 'ls') {
-				print(targets.map((t) => t.key).join('  '));
+				print([...targets.map((t) => t.key), ...Object.keys(files)].join('  '));
+				return;
+			}
+
+			if (verb === 'cat') {
+				const name = arg.replace(/^\.?\/?/, '');
+				const contents = files[name];
+				if (contents) {
+					printBlock(contents);
+				} else {
+					print(`cat: ${arg || 'missing operand'}: No such file`);
+				}
 				return;
 			}
 
