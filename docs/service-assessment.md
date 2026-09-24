@@ -5,7 +5,7 @@ grade and date when the evidence changes. Last assessed 2026-09-24.
 
 | Facet         | Grade | Notes                                                                                                                                                                 |
 | :------------ | :---- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Functionality | B+    | Home terminal (tab completion, chips), projects and experience pages work. Only 3 projects; content depth is #9.                                                      |
+| Functionality | B+    | Home terminal (tab completion), projects and experience pages work. Only 3 projects; content depth is #9.                                                             |
 | Security      | A-    | Meta CSP with hashes, `form-action 'none'`, prod `npm audit` gate, e2e CSP check. CSP not yet eyeballed in devtools; no HTTP headers possible on Pages.               |
 | Testing       | A-    | 48 unit tests, 100% lines and 94.5% branches on the measured `src/lib` file; e2e covers layout, a11y (axe) and CSP. No manual VoiceOver pass yet.                     |
 | Accessibility | A-    | Lighthouse 100 on all routes and axe e2e. Manual keyboard and screen reader pass still open.                                                                          |

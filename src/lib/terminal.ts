@@ -137,16 +137,6 @@ export function complete(input: string, ctx: CommandContext): Completion {
 	return { value: `${head}${commonPrefix(matches)}`, candidates: matches };
 }
 
-/** Commands offered as tappable shortcuts, derived from the site's targets. */
-export function suggestions({ targets, resume }: CommandContext): string[] {
-	return [
-		'help',
-		'ls',
-		...(resume ? ['cat resume'] : []),
-		...targets.map((t) => `${t.verb} ${t.key}`),
-	];
-}
-
 export interface History {
 	/** Record a submitted command (blank input is ignored) and reset navigation. */
 	push(value: string): void;

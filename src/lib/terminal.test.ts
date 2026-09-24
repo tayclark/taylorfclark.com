@@ -8,7 +8,6 @@ import {
 	findTarget,
 	openAllMessage,
 	runCommand,
-	suggestions,
 	type CommandContext,
 } from './terminal';
 
@@ -245,24 +244,5 @@ describe('complete', () => {
 			value: 'cd projects x',
 			candidates: [],
 		});
-	});
-});
-
-describe('suggestions', () => {
-	it('offers help, ls, cat resume, then every target', () => {
-		expect(suggestions(ctx)).toEqual([
-			'help',
-			'ls',
-			'cat resume',
-			'open github',
-			'open linkedin',
-			'open email',
-			'cd projects',
-			'cd experience',
-		]);
-	});
-
-	it('omits cat resume without resume data', () => {
-		expect(suggestions({ targets: [], resume: null })).toEqual(['help', 'ls']);
 	});
 });
