@@ -8,10 +8,9 @@ module.exports = {
 			staticDistDir: './dist',
 			url: ['/', '/projects/', '/experience/'].map((p) => `http://localhost${p}`),
 			numberOfRuns: 3,
-			settings: {
-				// Lantern simulation has produced false LCP regressions elsewhere.
-				throttlingMethod: 'devtools',
-			},
+			// Default (Lantern) throttling. Measured 2026-09-24: perf 100 and LCP within
+			// 1 ms across reps in ~95 s, vs. 627-806 ms LCP spread in ~245 s with
+			// 'devtools'. Revert to devtools if Lantern reports a false LCP regression.
 		},
 		assert: {
 			assertions: {
