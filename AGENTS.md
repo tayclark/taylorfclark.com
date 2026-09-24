@@ -1,25 +1,22 @@
-## Development
+# taylorfclark.com
 
-When starting the dev server, use background mode:
+Personal portfolio: a static Astro 7 site (TypeScript, no UI framework) with a
+terminal-style prompt on the home page, deployed to GitHub Pages at
+`taylorfclark.com` (`public/CNAME`).
 
-```
-astro dev --background
-```
+## Stack and commands
 
-Manage the background server with `astro dev stop`, `astro dev status`, and `astro dev logs`.
-
-## Documentation
-
-Full documentation: https://docs.astro.build
-
-Consult these guides before working on related tasks:
-
-- [Adding pages, dynamic routes, or middleware](https://docs.astro.build/en/guides/routing/)
-- [Working with Astro components](https://docs.astro.build/en/basics/astro-components/)
-- [Using React, Vue, Svelte, or other framework components](https://docs.astro.build/en/guides/framework-components/)
-- [Adding or managing content](https://docs.astro.build/en/guides/content-collections/)
-- [Adding styles or using Tailwind](https://docs.astro.build/en/guides/styling/)
-- [Supporting multiple languages](https://docs.astro.build/en/guides/internationalization/)
+- Node `>=22.22.1` (`.nvmrc` is 22; run `nvm use`). Package manager is npm.
+- Dev server: `npx astro dev --background`; manage it with `npx astro dev stop`,
+  `status` and `logs`. Astro also backgrounds `dev`/`preview` on its own when it
+  detects an agent, so Playwright passes `--ignore-lock`.
+- `npm run check` (astro check), `lint` (strict typescript-eslint), `format:check`
+  (Prettier), `test:unit` / `test:coverage` (Vitest), `test:e2e` (Playwright, axe
+  a11y, layout and CSP checks against the built site on port 4322) and
+  `lighthouse:ci` (needs a fresh `npm run build` first).
+- Run check, lint, format:check and test:coverage before calling a change done.
+  A husky pre-commit hook runs eslint and prettier on staged files, and
+  commitlint enforces Conventional Commits with body lines of at most 100 chars.
 
 ## Architecture
 
@@ -34,3 +31,28 @@ Consult these guides before working on related tasks:
   values; `SiteHeader.astro` renders the shared nav from `pageLinks` in `site.ts`.
 - Files under `src/lib/**` must stay at least 90% covered (`vitest.config.ts`).
   Tests that touch the DOM need `// @vitest-environment jsdom` at the top.
+
+- `src/data/resume.ts` feeds only the terminal's `cat resume`. The `/experience`
+  page keeps its own inline entries in `experience.astro`, so a resume edit must
+  be made in both places until they are unified.
+
+## Security and CSP
+
+GitHub Pages can't set headers, so Astro emits the CSP as a `<meta>` tag with
+build-time hashes (`security.csp` in `astro.config.mjs`). It only applies in
+`build` and `preview`, not `astro dev`, and uses one shared hash set across all
+pages. `tests/e2e/security.spec.ts` fails on console CSP violations.
+
+## CI, branches and launch status
+
+- `.github/workflows/deploy.yml` has one `build` job (npm audit for prod deps,
+  check, lint, format, coverage, build, Lighthouse CI, e2e) and a `deploy` job
+  that runs only on `main`. `build` is the required status check on `main`;
+  branch protection applies to admins too and forbids force-push and deletion.
+- Work on a feature branch, open a PR, and merge with `gh pr merge --merge`
+  (history uses merge commits). Dependabot runs weekly and ignores TypeScript
+  major bumps until typescript-eslint and `@astrojs/check` support v7.
+- The site is `noindex, nofollow` (`Layout.astro`) until SEO launch prep (#3), so
+  the Lighthouse SEO assertion is warn-only. #3 flips it to `error`.
+- `CLAUDE.md` is a symlink to `AGENTS.md`; edit and stage `AGENTS.md`.
+- Grades per facet live in `docs/service-assessment.md`.
