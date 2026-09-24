@@ -2,13 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import TerminalPrompt from '../components/TerminalPrompt.astro';
 import { resume } from '../data/resume';
-import {
-	SITE_DESCRIPTION,
-	SITE_TITLE,
-	contactLinks,
-	pageLinks,
-	terminalTargets,
-} from '../data/site';
+import { SITE_DESCRIPTION, SITE_TITLE, contactLinks, terminalTargets } from '../data/site';
 ---
 
 <Layout title={SITE_TITLE} description={SITE_DESCRIPTION}>
@@ -82,12 +76,6 @@ import {
 				))}
 			</nav>
 
-			<nav class="page-links" aria-label="Pages">
-				{pageLinks.map((link) => (
-					<a href={link.href}>{link.label}</a>
-				))}
-			</nav>
-
 			<div class="terminal-card">
 				<p class="terminal-label">or, try the terminal —</p>
 				<TerminalPrompt targets={terminalTargets} resume={resume} />
@@ -103,13 +91,13 @@ import {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 1.25rem;
+		gap: var(--space-5);
 		text-align: center;
-		padding: 4rem 1.5rem 3rem;
+		padding: var(--space-16) var(--space-6) var(--space-12);
 	}
 
 	h1 {
-		font-size: 2.25rem;
+		font-size: var(--text-2xl);
 		margin: 0;
 	}
 
@@ -125,24 +113,19 @@ import {
 
 	.outside {
 		margin: -0.75rem 0 0;
-		font-size: 0.9rem;
+		font-size: var(--text-md);
 		color: var(--color-text-dim);
 	}
 
 	.contact-links {
 		display: flex;
-		gap: 1.5rem;
-		font-size: 1.05rem;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: var(--space-3) var(--space-6);
+		font-size: var(--text-base);
 	}
 
-	.page-links {
-		display: flex;
-		gap: 1.25rem;
-		font-size: 0.9rem;
-	}
-
-	.contact-links a,
-	.page-links a {
+	.contact-links a {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.4rem;
@@ -156,33 +139,32 @@ import {
 		flex-shrink: 0;
 	}
 
-	.contact-links a:hover,
-	.page-links a:hover {
+	.contact-links a:hover {
 		color: var(--color-accent);
 		border-color: var(--color-accent);
 	}
 
 	.terminal-card {
-		--color-bg: #14150f;
-		--color-text: #d9d5c9;
-		--color-text-dim: #8a8676;
-		--color-accent: #7fbf6b;
+		--color-bg: var(--term-bg);
+		--color-text: var(--term-text);
+		--color-text-dim: var(--term-dim);
+		--color-accent: var(--term-accent);
 
 		width: 100%;
 		max-width: 28rem;
-		margin-top: 1.5rem;
+		margin-top: var(--space-6);
 		background: var(--color-bg);
-		border: 1px solid #2a2c22;
-		border-radius: 0.75rem;
-		padding: 1.25rem 1.5rem;
-		box-shadow: 0 1rem 2.5rem rgba(20, 21, 15, 0.12);
+		border: 1px solid var(--term-border);
+		border-radius: var(--radius-lg);
+		padding: var(--space-5) var(--space-6);
+		box-shadow: 0 1rem 2.5rem var(--term-shadow);
 		text-align: left;
 	}
 
 	.terminal-label {
 		margin: 0 0 0.6rem;
-		font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-		font-size: 0.75rem;
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
 		color: var(--color-text-dim);
 	}
 </style>

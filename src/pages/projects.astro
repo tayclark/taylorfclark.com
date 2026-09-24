@@ -7,12 +7,8 @@ import { projects } from '../data/projects';
 	title="Projects — Taylor Clark"
 	description="osprey, coast-crm, and clutterclear — integration, SaaS, and AI/mobile project work."
 >
-	<main id="main">
-		<a class="back" href="/" aria-label="Back to home">
-			$ cd ..
-		</a>
-
-		<h1>Projects</h1>
+	<main id="main" class="page-main">
+		<h1 class="page-title">Projects</h1>
 
 		{projects.map((project) => (
 			<article class="card">
@@ -27,37 +23,7 @@ import { projects } from '../data/projects';
 </Layout>
 
 <style>
-	main {
-		max-width: var(--max-width);
-		margin: 0 auto;
-		padding: 3rem 1.5rem 4rem;
-	}
-
-	.back {
-		display: inline-block;
-		font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-		font-size: 0.9rem;
-		color: var(--color-text-dim);
-		text-decoration: none;
-		margin-bottom: 2rem;
-	}
-
-	.back:hover {
-		color: var(--color-accent);
-	}
-
-	h1 {
-		font-size: 1.75rem;
-		margin: 0 0 2rem;
-	}
-
-	.card {
-		margin-bottom: 1.75rem;
-	}
-
 	.card h2 {
-		font-size: 1.1rem;
-		margin: 0 0 0.25rem;
 		display: flex;
 		align-items: baseline;
 		gap: 0.6rem;
@@ -65,7 +31,7 @@ import { projects } from '../data/projects';
 	}
 
 	.card .tag {
-		font-size: 0.75rem;
+		font-size: var(--text-xs);
 		font-weight: 400;
 		color: var(--color-text-dim);
 		text-transform: uppercase;

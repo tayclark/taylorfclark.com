@@ -54,8 +54,8 @@ const chips = suggestions({ targets, resume });
 		--terminal-collapsed-height: 5.5em;
 		--terminal-expanded-height: 60vh;
 
-		font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-		font-size: 0.9rem;
+		font-family: var(--font-mono);
+		font-size: var(--text-md);
 	}
 
 	.output {
@@ -107,8 +107,9 @@ const chips = suggestions({ targets, resume });
 
 	:global(.r-role-line) {
 		display: flex;
+		flex-wrap: wrap;
 		justify-content: space-between;
-		gap: 0.75rem;
+		gap: 0 var(--space-3);
 		margin-top: 0.6rem;
 		font-weight: 700;
 	}
@@ -163,7 +164,7 @@ const chips = suggestions({ targets, resume });
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.4rem;
-		margin-top: 0.75rem;
+		margin-top: var(--space-3);
 	}
 
 	.chip {
@@ -171,7 +172,7 @@ const chips = suggestions({ targets, resume });
 		padding: 0.25rem 0.6rem;
 		background: transparent;
 		border: 1px solid var(--color-text-dim);
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		color: var(--color-text-dim);
 		font: inherit;
 		font-size: 0.8rem;

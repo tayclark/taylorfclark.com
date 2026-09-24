@@ -1,0 +1,73 @@
+---
+import { pageLinks } from '../data/site';
+
+const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const current = (href: string) => (path === href ? 'page' : undefined);
+---
+
+<header class="site-header">
+	<nav aria-label="Primary">
+		<a class="brand" href="/" aria-current={current('/')}>
+			taylorfclark.com
+		</a>
+		<ul>
+			{pageLinks.map((link) => (
+				<li>
+					<a href={link.href} aria-current={current(link.href)}>
+						{link.label}
+					</a>
+				</li>
+			))}
+		</ul>
+	</nav>
+</header>
+
+<style>
+	.site-header {
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	nav {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0 var(--space-6);
+		max-width: var(--max-width);
+		margin: 0 auto;
+		padding: 0 var(--space-6);
+	}
+
+	ul {
+		display: flex;
+		gap: var(--space-2);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 2.75rem;
+		padding: 0 var(--space-2);
+		color: var(--color-text-dim);
+		font-size: var(--text-md);
+		text-decoration: none;
+	}
+
+	a:hover,
+	a[aria-current='page'] {
+		color: var(--color-accent);
+	}
+
+	a[aria-current='page'] {
+		text-decoration: underline;
+		text-underline-offset: 0.35em;
+	}
+
+	.brand {
+		margin-left: calc(var(--space-2) * -1);
+		font-family: var(--font-mono);
+	}
+</style>

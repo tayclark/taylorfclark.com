@@ -56,12 +56,8 @@ const experience = [
 	title="Experience — Taylor Clark"
 	description="A decade of backend and integrations experience: Coast Software, Vitally, Tray.io, Cloud Elements."
 >
-	<main id="main">
-		<a class="back" href="/" aria-label="Back to home">
-			$ cd ..
-		</a>
-
-		<h1>Experience</h1>
+	<main id="main" class="page-main">
+		<h1 class="page-title">Experience</h1>
 
 		{experience.map((job) => (
 			<article class="card">
@@ -81,41 +77,8 @@ const experience = [
 </Layout>
 
 <style>
-	main {
-		max-width: var(--max-width);
-		margin: 0 auto;
-		padding: 3rem 1.5rem 4rem;
-	}
-
-	.back {
-		display: inline-block;
-		font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-		font-size: 0.9rem;
-		color: var(--color-text-dim);
-		text-decoration: none;
-		margin-bottom: 2rem;
-	}
-
-	.back:hover {
-		color: var(--color-accent);
-	}
-
-	h1 {
-		font-size: 1.75rem;
-		margin: 0 0 2rem;
-	}
-
-	.card {
-		margin-bottom: 1.75rem;
-	}
-
-	.card h2 {
-		font-size: 1.1rem;
-		margin: 0 0 0.25rem;
-	}
-
 	.card .dates {
-		font-size: 0.85rem;
+		font-size: var(--text-sm);
 		color: var(--color-text-dim);
 		margin: 0 0 0.5rem;
 	}
