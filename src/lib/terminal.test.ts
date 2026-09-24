@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import type { ResumeData } from '../data/resume';
+import type { Target } from '../data/site';
 import {
 	createHistory,
 	findTarget,
 	openAllMessage,
 	runCommand,
 	type CommandContext,
-	type Target,
 } from './terminal';
 
 const targets: Target[] = [

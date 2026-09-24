@@ -1,11 +1,5 @@
 import type { ResumeData } from '../data/resume';
-
-export interface Target {
-	key: string;
-	verb: 'open' | 'cd';
-	href: string;
-	external?: boolean;
-}
+import type { Target } from '../data/site';
 
 export type TerminalAction =
 	| { type: 'print-resume' }

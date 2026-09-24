@@ -1,6 +1,6 @@
 ---
 import type { ResumeData } from '../data/resume';
-import type { Target } from '../lib/terminal';
+import type { Target } from '../data/site';
 
 interface Props {
 	targets: Target[];
@@ -42,12 +42,15 @@ const { targets, resume } = Astro.props;
 
 <style>
 	.terminal {
+		--terminal-collapsed-height: 5.5em;
+		--terminal-expanded-height: 60vh;
+
 		font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 		font-size: 0.9rem;
 	}
 
 	.output {
-		max-height: 5.5em;
+		max-height: var(--terminal-collapsed-height);
 		overflow-y: auto;
 		margin-bottom: 0.5rem;
 		color: var(--color-text-dim);
@@ -62,7 +65,7 @@ const { targets, resume } = Astro.props;
 	}
 
 	:global(.output:has(.block)) {
-		max-height: 60vh;
+		max-height: var(--terminal-expanded-height);
 	}
 
 	:global(.resume) {
@@ -161,7 +164,10 @@ const { targets, resume } = Astro.props;
 
 <script>
 	import type { ResumeData } from '../data/resume';
-	import { createHistory, openAllMessage, runCommand, type Target } from '../lib/terminal';
+	import type { Target } from '../data/site';
+	import { el } from '../lib/dom';
+	import { buildResume } from '../lib/resume-dom';
+	import { createHistory, openAllMessage, runCommand } from '../lib/terminal';
 
 	const root = document.getElementById('term-root');
 	const output = document.getElementById('term-output');
@@ -173,97 +179,32 @@ const { targets, resume } = Astro.props;
 		const out = output;
 		const live = status;
 		const history = createHistory();
+		const MAX_LINES = 6;
 		const MAX_ANNOUNCEMENTS = 3;
 
 		function trim() {
-			while (out.childNodes.length > 6 && out.firstChild) {
+			while (out.childNodes.length > MAX_LINES && out.firstChild) {
 				out.removeChild(out.firstChild);
 			}
 		}
 
 		/** Screen-reader announcement, kept separate from the output so long blocks aren't read aloud. */
 		function announce(message: string) {
-			const div = document.createElement('div');
-			div.textContent = message;
-			live.appendChild(div);
+			live.appendChild(el('div', undefined, message));
 			while (live.childNodes.length > MAX_ANNOUNCEMENTS && live.firstChild) {
 				live.removeChild(live.firstChild);
 			}
 		}
 
 		function print(line: string) {
-			const div = document.createElement('div');
-			div.textContent = line;
-			out.appendChild(div);
+			out.appendChild(el('div', undefined, line));
 			announce(line);
 			trim();
 			out.scrollTop = out.scrollHeight;
 		}
 
 		function printResume(data: ResumeData) {
-			const container = document.createElement('div');
-			container.className = 'block resume';
-
-			const name = document.createElement('div');
-			name.className = 'r-name';
-			name.textContent = data.name;
-			container.appendChild(name);
-
-			const contact = document.createElement('div');
-			contact.className = 'r-contact';
-			contact.textContent = data.contact;
-			container.appendChild(contact);
-
-			const summary = document.createElement('p');
-			summary.className = 'r-summary';
-			summary.textContent = data.summary;
-			container.appendChild(summary);
-
-			for (const section of data.sections) {
-				const heading = document.createElement('div');
-				heading.className = 'r-heading';
-				heading.textContent = section.title;
-				container.appendChild(heading);
-
-				for (const entry of section.entries) {
-					const roleLine = document.createElement('div');
-					roleLine.className = 'r-role-line';
-					const roleSpan = document.createElement('span');
-					roleSpan.textContent = entry.org ? `${entry.role} — ${entry.org}` : entry.role;
-					const datesSpan = document.createElement('span');
-					datesSpan.className = 'r-dates';
-					datesSpan.textContent = entry.dates;
-					roleLine.append(roleSpan, datesSpan);
-					container.appendChild(roleLine);
-
-					if (entry.blurb) {
-						const blurb = document.createElement('div');
-						blurb.className = 'r-blurb';
-						blurb.textContent = entry.blurb;
-						container.appendChild(blurb);
-					}
-
-					if (entry.bullets.length) {
-						const ul = document.createElement('ul');
-						ul.className = 'r-bullets';
-						for (const bullet of entry.bullets) {
-							const li = document.createElement('li');
-							li.textContent = bullet;
-							ul.appendChild(li);
-						}
-						container.appendChild(ul);
-					}
-
-					if (entry.tech) {
-						const tech = document.createElement('div');
-						tech.className = 'r-tech';
-						tech.textContent = `Technologies: ${entry.tech}`;
-						container.appendChild(tech);
-					}
-				}
-			}
-
-			out.appendChild(container);
+			out.appendChild(buildResume(data));
 			announce('Resume printed in the terminal output. It is also on the Experience page.');
 			trim();
 			out.scrollTop = out.scrollHeight;
