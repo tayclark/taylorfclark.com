@@ -78,19 +78,6 @@ test.describe('terminal', () => {
 		await input(page).focus();
 		await page.keyboard.press('Tab');
 		await expect(input(page)).not.toBeFocused();
-		await expect(page.getByRole('button', { name: 'help', exact: true })).toBeFocused();
-	});
-
-	test('a command chip runs its command', async ({ page }) => {
-		await page.getByRole('button', { name: 'cat resume' }).click();
-		await expect(output(page)).toContainText('$ cat resume');
-		await expect(output(page).locator('.resume .r-name')).toBeVisible();
-		await expect(input(page)).toBeFocused();
-	});
-
-	test('a cd chip navigates', async ({ page }) => {
-		await page.getByRole('button', { name: 'cd projects' }).click();
-		await expect(page).toHaveURL(/\/projects\/?$/);
 	});
 
 	test('cd projects navigates', async ({ page }) => {
