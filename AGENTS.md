@@ -32,9 +32,8 @@ terminal-style prompt on the home page, deployed to GitHub Pages at
 - Files under `src/lib/**` must stay at least 90% covered (`vitest.config.ts`).
   Tests that touch the DOM need `// @vitest-environment jsdom` at the top.
 
-- `src/data/resume.ts` feeds only the terminal's `cat resume`. The `/experience`
-  page keeps its own inline entries in `experience.astro`, so a resume edit must
-  be made in both places until they are unified.
+- `src/data/resume.ts` is the single source for the terminal's `cat resume` and the
+  `/experience` page, which renders its `Experience` section.
 
 ## Performance budgets
 

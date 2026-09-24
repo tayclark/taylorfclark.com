@@ -14,6 +14,19 @@ test.describe('routes', () => {
 	}
 });
 
+test('unknown routes serve the 404 page', async ({ page }) => {
+	await page.goto('/404.html');
+	await expect(page.getByRole('heading', { level: 1, name: 'Page not found' })).toBeVisible();
+	await page.getByRole('link', { name: 'Back to the home page' }).click();
+	await expect(page).toHaveURL(/\/$/);
+});
+
+test('home page CTA links to projects', async ({ page }) => {
+	await page.goto('/');
+	await page.getByRole('link', { name: 'View projects' }).click();
+	await expect(page).toHaveURL(/\/projects\/?$/);
+});
+
 test.describe('terminal', () => {
 	test.beforeEach(async ({ page }) => {
 		await page.goto('/');
