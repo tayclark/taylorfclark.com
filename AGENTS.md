@@ -29,5 +29,8 @@ Consult these guides before working on related tasks:
 - `src/lib/` holds the terminal logic as standalone modules: `terminal.ts`,
   `dom.ts` (`el()` DOM helper) and `resume-dom.ts` (`buildResume`). The
   `TerminalPrompt.astro` script only wires them to the page.
+- `src/styles/tokens.css` holds the design tokens (color, type, spacing, terminal
+  theme) and documents them in its header comment. Use the tokens instead of raw
+  values; `SiteHeader.astro` renders the shared nav from `pageLinks` in `site.ts`.
 - Files under `src/lib/**` must stay at least 90% covered (`vitest.config.ts`).
   Tests that touch the DOM need `// @vitest-environment jsdom` at the top.
