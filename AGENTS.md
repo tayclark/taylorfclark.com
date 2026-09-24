@@ -53,10 +53,14 @@ pages. `tests/e2e/security.spec.ts` fails on console CSP violations.
 
 ## CI, branches and launch status
 
-- `.github/workflows/deploy.yml` has one `build` job (npm audit for prod deps,
-  check, lint, format, coverage, build, Lighthouse CI, e2e) and a `deploy` job
-  that runs only on `main`. `build` is the required status check on `main`;
-  branch protection applies to admins too and forbids force-push and deletion.
+- `.github/workflows/deploy.yml` has a `build` job (npm audit for prod deps,
+  check, lint, format, coverage, build, e2e), a PR-only `lighthouse` job that runs
+  in parallel on its own runner (Lighthouse is most of the pipeline's time, so it
+  doesn't run again after merge), and a `deploy` job that runs only on `main`.
+  `build` and `lighthouse` are the required status checks on `main`; branch
+  protection applies to admins too and forbids force-push and deletion. Actions are
+  pinned to commit SHAs (Dependabot keeps them current) and the workflow token is
+  read-only except on `deploy`.
 - Work on a feature branch, open a PR, and merge with `gh pr merge --merge`
   (history uses merge commits). Dependabot runs weekly and ignores TypeScript
   major bumps until typescript-eslint and `@astrojs/check` support v7.
