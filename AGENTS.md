@@ -36,6 +36,14 @@ terminal-style prompt on the home page, deployed to GitHub Pages at
   page keeps its own inline entries in `experience.astro`, so a resume edit must
   be made in both places until they are unified.
 
+## Performance budgets
+
+`lighthouserc.cjs` asserts Lighthouse performance 100 on every route, LCP <= 2.5 s, script <= 10 KB
+and total <= 150 KB (raw bytes), with zero third-party and zero font requests. `tests/e2e/performance.spec.ts`
+also fails on cross-origin requests, `<img>` without `width`/`height`, and `@font-face` without
+`font-display: swap`. Load images through `astro:assets` (explicit size, webp/avif, preload the LCP
+image) and keep the system font stack, or self-host a subsetted font and raise the font budget on purpose.
+
 ## Security and CSP
 
 GitHub Pages can't set headers, so Astro emits the CSP as a `<meta>` tag with
