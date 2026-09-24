@@ -85,6 +85,68 @@ export function runCommand(raw: string, { targets, resume }: CommandContext): Co
 	return { lines: [echo, `command not found: ${verb}`] };
 }
 
+export const COMMANDS = ['help', 'ls', 'cd', 'open', 'cat'] as const;
+
+export interface Completion {
+	/** The input after completing as far as is unambiguous. */
+	value: string;
+	/** Every match when the completion is ambiguous, otherwise empty. */
+	candidates: string[];
+}
+
+function commonPrefix(words: string[]) {
+	let prefix = words[0] ?? '';
+	for (const word of words) {
+		while (!word.startsWith(prefix)) prefix = prefix.slice(0, -1);
+	}
+	return prefix;
+}
+
+function argOptions(verb: string, { targets, resume }: CommandContext): string[] {
+	const keys = (v: Target['verb']) => targets.filter((t) => t.verb === v).map((t) => t.key);
+	switch (verb) {
+		case 'cd':
+			return [...keys('cd'), 'home'];
+		case 'open':
+			return [...keys('open'), 'all'];
+		case 'cat':
+			return resume ? ['resume'] : [];
+		default:
+			return [];
+	}
+}
+
+/** Tab-completion for the verb or, once a verb is typed, its single argument. */
+export function complete(input: string, ctx: CommandContext): Completion {
+	const unchanged: Completion = { value: input, candidates: [] };
+	const text = input.trimStart();
+	if (!text) return unchanged;
+
+	const parts = /^(\S+)\s+(\S*)$/.exec(text);
+	const head = parts ? `${parts[1]} ` : '';
+	const prefix = parts ? (parts[2] ?? '') : text;
+	if (!parts && /\s/.test(text)) return unchanged;
+
+	const options = parts ? argOptions(parts[1] ?? '', ctx) : [...COMMANDS];
+	const matches = options.filter((o) => o.startsWith(prefix));
+	if (matches.length === 0) return unchanged;
+	if (matches.length === 1) {
+		const [only = ''] = matches;
+		return { value: `${head}${only}${parts ? '' : ' '}`, candidates: [] };
+	}
+	return { value: `${head}${commonPrefix(matches)}`, candidates: matches };
+}
+
+/** Commands offered as tappable shortcuts, derived from the site's targets. */
+export function suggestions({ targets, resume }: CommandContext): string[] {
+	return [
+		'help',
+		'ls',
+		...(resume ? ['cat resume'] : []),
+		...targets.map((t) => `${t.verb} ${t.key}`),
+	];
+}
+
 export interface History {
 	/** Record a submitted command (blank input is ignored) and reset navigation. */
 	push(value: string): void;

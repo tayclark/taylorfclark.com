@@ -1,6 +1,7 @@
 ---
 import type { ResumeData } from '../data/resume';
 import type { Target } from '../data/site';
+import { suggestions } from '../lib/terminal';
 
 interface Props {
 	targets: Target[];
@@ -8,6 +9,7 @@ interface Props {
 }
 
 const { targets, resume } = Astro.props;
+const chips = suggestions({ targets, resume });
 ---
 
 <div
@@ -37,6 +39,13 @@ const { targets, resume } = Astro.props;
 			aria-label="Terminal command input — try help"
 			placeholder="try: help"
 		/>
+	</div>
+	<div class="chips" role="group" aria-label="Command shortcuts">
+		{chips.map((command) => (
+			<button type="button" class="chip" data-command={command}>
+				{command}
+			</button>
+		))}
 	</div>
 </div>
 
@@ -150,6 +159,48 @@ const { targets, resume } = Astro.props;
 		min-width: 0;
 	}
 
+	.chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+		margin-top: 0.75rem;
+	}
+
+	.chip {
+		min-height: 2rem;
+		padding: 0.25rem 0.6rem;
+		background: transparent;
+		border: 1px solid var(--color-text-dim);
+		border-radius: 999px;
+		color: var(--color-text-dim);
+		font: inherit;
+		font-size: 0.8rem;
+		cursor: pointer;
+	}
+
+	.chip:hover {
+		color: var(--color-accent);
+		border-color: var(--color-accent);
+	}
+
+	.chip:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 2px;
+	}
+
+	/* Touch: bigger tap targets, and 16px input text so iOS Safari doesn't zoom on focus. */
+	@media (pointer: coarse) {
+		.chip {
+			min-height: 2.75rem;
+			padding: 0.25rem 0.9rem;
+			font-size: 0.9rem;
+		}
+
+		input {
+			font-size: 1rem;
+		}
+	}
+
 	input:focus-visible {
 		outline: 2px solid var(--color-accent);
 		outline-offset: 4px;
@@ -167,7 +218,7 @@ const { targets, resume } = Astro.props;
 	import type { Target } from '../data/site';
 	import { el } from '../lib/dom';
 	import { buildResume } from '../lib/resume-dom';
-	import { createHistory, openAllMessage, runCommand } from '../lib/terminal';
+	import { complete, createHistory, openAllMessage, runCommand } from '../lib/terminal';
 
 	const root = document.getElementById('term-root');
 	const output = document.getElementById('term-output');
@@ -236,12 +287,29 @@ const { targets, resume } = Astro.props;
 			}
 		}
 
+		const submit = (value: string) => {
+			run(value);
+			history.push(value);
+			input.value = '';
+		};
+
+		root.addEventListener('click', (event) => {
+			const chip = (event.target as Element).closest<HTMLElement>('.chip');
+			if (!chip?.dataset.command) return;
+			submit(chip.dataset.command);
+			input.focus();
+		});
+
 		input.addEventListener('keydown', (event) => {
 			if (event.key === 'Enter') {
-				const value = input.value;
-				run(value);
-				history.push(value);
-				input.value = '';
+				submit(input.value);
+			} else if (event.key === 'Tab' && !event.shiftKey) {
+				const { value, candidates } = complete(input.value, { targets, resume });
+				// Nothing to complete (e.g. empty input): let Tab move focus on, not trap it.
+				if (value === input.value && candidates.length === 0) return;
+				event.preventDefault();
+				input.value = value;
+				if (candidates.length > 0) print(candidates.join('  '));
 			} else if (event.key === 'ArrowUp') {
 				const previous = history.up();
 				if (previous !== null) {

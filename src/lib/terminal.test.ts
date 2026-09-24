@@ -2,10 +2,13 @@ import { describe, expect, it } from 'vitest';
 import type { ResumeData } from '../data/resume';
 import type { Target } from '../data/site';
 import {
+	COMMANDS,
+	complete,
 	createHistory,
 	findTarget,
 	openAllMessage,
 	runCommand,
+	suggestions,
 	type CommandContext,
 } from './terminal';
 
@@ -180,5 +183,86 @@ describe('createHistory', () => {
 		expect(h.up()).toBe('a');
 		expect(h.up()).toBe('a');
 		expect(h.up()).toBeNull();
+	});
+});
+
+describe('complete', () => {
+	it('leaves blank input alone', () => {
+		expect(complete('', ctx)).toEqual({ value: '', candidates: [] });
+		expect(complete('   ', ctx)).toEqual({ value: '   ', candidates: [] });
+	});
+
+	it('completes a unique verb prefix with a trailing space', () => {
+		expect(complete('he', ctx)).toEqual({ value: 'help ', candidates: [] });
+		expect(complete('  ca', ctx)).toEqual({ value: 'cat ', candidates: [] });
+	});
+
+	it('leaves an unknown verb prefix alone', () => {
+		expect(complete('zz', ctx)).toEqual({ value: 'zz', candidates: [] });
+	});
+
+	it('lists candidates for an ambiguous verb prefix', () => {
+		const verbs = COMMANDS.filter((c) => c.startsWith('c'));
+		expect(complete('c', ctx)).toEqual({ value: 'c', candidates: verbs });
+	});
+
+	it('completes cd arguments from cd targets and home', () => {
+		expect(complete('cd pr', ctx)).toEqual({ value: 'cd projects', candidates: [] });
+		expect(complete('cd ho', ctx)).toEqual({ value: 'cd home', candidates: [] });
+		expect(complete('cd ', ctx).candidates).toEqual(['projects', 'experience', 'home']);
+	});
+
+	it('completes open arguments from open targets and all', () => {
+		expect(complete('open al', ctx)).toEqual({ value: 'open all', candidates: [] });
+		expect(complete('open git', ctx).value).toBe('open github');
+	});
+
+	it('extends to the common prefix when several arguments match', () => {
+		const many: CommandContext = {
+			resume: null,
+			targets: [
+				{ key: 'alpha', verb: 'open', href: '/a' },
+				{ key: 'alpine', verb: 'open', href: '/b' },
+			],
+		};
+		expect(complete('open a', many)).toEqual({
+			value: 'open al',
+			candidates: ['alpha', 'alpine', 'all'],
+		});
+	});
+
+	it('completes cat resume only when resume data exists', () => {
+		expect(complete('cat re', ctx).value).toBe('cat resume');
+		expect(complete('cat re', { targets, resume: null })).toEqual({
+			value: 'cat re',
+			candidates: [],
+		});
+	});
+
+	it('does nothing for verbs without arguments or extra words', () => {
+		expect(complete('help ', ctx)).toEqual({ value: 'help ', candidates: [] });
+		expect(complete('cd projects x', ctx)).toEqual({
+			value: 'cd projects x',
+			candidates: [],
+		});
+	});
+});
+
+describe('suggestions', () => {
+	it('offers help, ls, cat resume, then every target', () => {
+		expect(suggestions(ctx)).toEqual([
+			'help',
+			'ls',
+			'cat resume',
+			'open github',
+			'open linkedin',
+			'open email',
+			'cd projects',
+			'cd experience',
+		]);
+	});
+
+	it('omits cat resume without resume data', () => {
+		expect(suggestions({ targets: [], resume: null })).toEqual(['help', 'ls']);
 	});
 });
