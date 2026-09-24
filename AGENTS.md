@@ -20,3 +20,14 @@ Consult these guides before working on related tasks:
 - [Adding or managing content](https://docs.astro.build/en/guides/content-collections/)
 - [Adding styles or using Tailwind](https://docs.astro.build/en/guides/styling/)
 - [Supporting multiple languages](https://docs.astro.build/en/guides/internationalization/)
+
+## Architecture
+
+- `src/data/` is the single source of truth for content: `site.ts` (links,
+  terminal targets, `SITE_TITLE`/`SITE_DESCRIPTION`), `projects.ts` (typed
+  `Project[]`) and `resume.ts`. Pages import from here rather than inlining data.
+- `src/lib/` holds the terminal logic as standalone modules: `terminal.ts`,
+  `dom.ts` (`el()` DOM helper) and `resume-dom.ts` (`buildResume`). The
+  `TerminalPrompt.astro` script only wires them to the page.
+- Files under `src/lib/**` must stay at least 90% covered (`vitest.config.ts`).
+  Tests that touch the DOM need `// @vitest-environment jsdom` at the top.
