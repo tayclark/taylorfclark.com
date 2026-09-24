@@ -2,54 +2,16 @@
 import Layout from '../layouts/Layout.astro';
 import TerminalPrompt from '../components/TerminalPrompt.astro';
 import { resume } from '../data/resume';
-
-const contactLinks = [
-	{
-		label: 'GitHub',
-		href: 'https://github.com/tayclark',
-		key: 'github',
-		verb: 'open' as const,
-		external: true,
-	},
-	{
-		label: 'LinkedIn',
-		href: 'https://www.linkedin.com/in/taylorfc',
-		key: 'linkedin',
-		verb: 'open' as const,
-		external: true,
-	},
-	{
-		label: 'Email',
-		href: 'mailto:taylorfclark@gmail.com',
-		key: 'email',
-		verb: 'open' as const,
-		external: false,
-	},
-];
-
-const pageLinks = [
-	{ label: 'Projects', href: '/projects', key: 'projects', verb: 'cd' as const, external: false },
-	{
-		label: 'Experience',
-		href: '/experience',
-		key: 'experience',
-		verb: 'cd' as const,
-		external: false,
-	},
-];
-
-const terminalTargets = [...contactLinks, ...pageLinks].map(({ key, verb, href, external }) => ({
-	key,
-	verb,
-	href,
-	external,
-}));
+import {
+	SITE_DESCRIPTION,
+	SITE_TITLE,
+	contactLinks,
+	pageLinks,
+	terminalTargets,
+} from '../data/site';
 ---
 
-<Layout
-	title="Taylor Clark — Software & Integration Engineer"
-	description="Backend and integrations engineer with a decade of experience building and operating production systems at early-stage SaaS startups."
->
+<Layout title={SITE_TITLE} description={SITE_DESCRIPTION}>
 	<main id="main" class="page">
 		<header class="hero">
 			<h1>Taylor Clark</h1>
